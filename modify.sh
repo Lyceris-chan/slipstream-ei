@@ -22,13 +22,14 @@ function wait_all() {
 # Function to extract files from ISO
 function extract_files() {
     iso_file="$1"
+    mount_dir=$(mktemp -d)
     extract_dir="$(basename "$iso_file" .iso)"
 
+    sudo mount -o loop,ro "$iso_file" "$mount_dir"
     mkdir -p "$extract_dir"
-
-    sudo mount -o loop,ro "$iso_file" "$extract_dir"
-    cp -r "$extract_dir"/* .
-    sudo umount "$extract_dir"
+    cp -r "$mount_dir"/* "$extract_dir"
+    sudo umount "$mount_dir"
+    rm -rf "$mount_dir"
 
     echo "Extracted files from $iso_file to $extract_dir"
 }
